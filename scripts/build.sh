@@ -28,8 +28,53 @@ server {
         ssl_protocols   TLSv1 TLSv1.1 TLSv1.2;
         ssl_prefer_server_ciphers  on;
         location / {
+            wallarm_mode monitoring;
             proxy_pass http://localhost;
         }
 }' >> /etc/nginx/conf.d/default.conf
 
+curl https://meganode.webmonitorx.ru/4.6/wallarm-4.6.12.x86_64-glibc.sh -O
+sh ./wallarm-4.6.12.x86_64-glibc.sh --noexec --target /opt/wallarm
+chmod a+x /opt/wallarm
+rm wallarm-4.6.12.x86_64-glibc.sh
+find /opt/wallarm/modules \
+    ! -wholename '/opt/wallarm/modules/stable-1221/*' \
+    \( -type f -o -type l \) -delete
+find /opt/wallarm/modules -empty -type d -delete
+cat << 'EOF' | tee "/etc/nginx/wallarm-status.conf" >/dev/null
+# wallarm-status, required for monitoring purposes.
+
+# Default `wallarm-status` configuration.
+# It is strongly advised not to alter any of the existing lines of the default
+# wallarm-status configuration as it may corrupt the process of metric data
+# upload to the Wallarm cloud.
+
+server {
+  listen 127.0.0.8:80;
+
+  server_name localhost;
+
+  allow 127.0.0.0/8;
+  deny all;
+
+  wallarm_mode off;
+  disable_acl "on";
+  access_log off;
+
+  location ~/wallarm-status$ {
+    wallarm_status on;
+  }
+}
+EOF
+
+sed -i \
+ -e '/^events {/i load_module /opt/wallarm/modules/stable-1221/ngx_http_wallarm_module.so;' \
+ -e '/^http {/a include /etc/nginx/wallarm-status.conf;' \
+ /etc/nginx/nginx.conf
+
+ln -sf /dev/stdout /var/log/nginx/access.log
+ln -sf /dev/stderr /var/log/nginx/error.log
+
+cp /tmp/docker-entrypoint.sh /
+cp /tmp/wait-for-it.sh /
 yum clean all
