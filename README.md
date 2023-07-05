@@ -5,6 +5,7 @@ Docker image based on AlmaLinux 8.8 plus OpenSSL GOST engine with nginx 1.22.1
 
 [run.sh](run.sh) script will execute container with nginx and will do test curl request using GOST encryption:
 ```
+$ ./run.sh
 * Rebuilt URL to: https://localhost/
 *   Trying 127.0.0.1...
 * TCP_NODELAY set
