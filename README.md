@@ -1,4 +1,4 @@
-# alma8-gost-linux
+# alma8-gost-nginx
 Docker image based on AlmaLinux 8.8 plus OpenSSL GOST engine with nginx 1.22.1 and WMX 4.6 module
 
 [certs](certs) folder contains self-signed GOST certificates used for testing
