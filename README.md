@@ -1,5 +1,5 @@
 # alma8-gost-nginx
-Docker image based on AlmaLinux 8.8 plus OpenSSL GOST engine with nginx 1.22.1
+[Docker image](https://hub.docker.com/r/dmikhin/alma8-gost-nginx) based on AlmaLinux 8.8 plus OpenSSL GOST engine with nginx 1.22.1
 
 [certs](certs) folder contains self-signed GOST certificates used for testing
 
